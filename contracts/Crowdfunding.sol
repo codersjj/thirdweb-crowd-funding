@@ -7,6 +7,7 @@ contract Crowdfunding {
     uint256 public goal;
     uint256 public deadline;
     address public owner;
+    bool public paused;
 
     enum CampaignState {
         Active,
@@ -36,6 +37,11 @@ contract Crowdfunding {
 
     modifier campaignOpen() {
         require(state == CampaignState.Active, "Campaign is not active.");
+        _;
+    }
+
+    modifier notPaused() {
+        require(!paused, "Contract is paused.");
         _;
     }
 
@@ -79,7 +85,7 @@ contract Crowdfunding {
         }
     }
 
-    function fund(uint256 _tierIndex) public payable campaignOpen {
+    function fund(uint256 _tierIndex) public payable campaignOpen notPaused {
         require(_tierIndex < tiers.length, "Invalid tier.");
         require(msg.value == tiers[_tierIndex].amount, "Incorrect amount");
 
@@ -111,6 +117,14 @@ contract Crowdfunding {
         payable(msg.sender).transfer(amount);
     }
 
+    function togglePause() public onlyOwner {
+        paused = !paused;
+    }
+
+    function extendDeadline(uint256 _daysToAdd) public onlyOwner campaignOpen {
+        deadline += _daysToAdd * 1 days;
+    }
+
     function getContractBalance() public view returns (uint256) {
         return address(this).balance;
     }
@@ -120,5 +134,20 @@ contract Crowdfunding {
         uint256 _tierIndex
     ) public view returns (bool) {
         return backers[_backer].fundedTiers[_tierIndex];
+    }
+
+    function getTiers() public view returns (Tier[] memory) {
+        return tiers;
+    }
+
+    function getCampaignStatus() public view returns (CampaignState) {
+        if (block.timestamp >= deadline && state == CampaignState.Active) {
+            return
+                address(this).balance >= goal
+                    ? CampaignState.Successful
+                    : CampaignState.Failed;
+        }
+
+        return state;
     }
 }
