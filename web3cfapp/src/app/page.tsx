@@ -5,6 +5,7 @@ import { client } from "./client";
 import { baseSepolia } from "thirdweb/chains";
 import { CROWDFUNDING_CONTRACT } from "./constants/contracts";
 import { useReadContract } from "thirdweb/react";
+import CampaignCard from "./components/CampaignCard";
 
 const contract = getContract({
   client: client,
@@ -27,9 +28,10 @@ export default function Home() {
         <div className="grid grid-cols-3 gap-4">
           {!isLoading && campaigns && campaigns.length ? (
             campaigns.map(campaign => (
-              <div key={campaign.campaignAddress}>
-                <p>{campaign.name}</p>
-              </div>
+              <CampaignCard
+                key={campaign.campaignAddress}
+                campaignAddress={campaign.campaignAddress}
+              />
             ))
           ) : (
             <p>No campaigns found</p>
