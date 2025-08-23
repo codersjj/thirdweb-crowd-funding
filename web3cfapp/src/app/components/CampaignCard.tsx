@@ -1,9 +1,6 @@
 'use client'
 
-import { getContract } from "thirdweb"
-import { useReadContract } from "thirdweb/react"
-import { client } from "../client"
-import { baseSepolia } from "thirdweb/chains"
+import { useCampaignData } from "@/app/hooks/useCampaignData"
 import Link from "next/link"
 
 type CampaignCardProps = {
@@ -11,40 +8,15 @@ type CampaignCardProps = {
 }
 
 export default function CampaignCard({ campaignAddress }: CampaignCardProps) {
-  const contract = getContract({
-    client,
-    chain: baseSepolia,
-    address: campaignAddress
-  })
-
-  const { data: campaignName } = useReadContract({
-    contract,
-    method: "function name() view returns (string)",
-    params: []
-  })
-
-  const { data: campaginDescription } = useReadContract({
-    contract,
-    method: "function description() view returns (string)",
-    params: []
-  })
-
-  const { data: campaignGoal, isLoading: isLoadingGoal } = useReadContract({
-    contract,
-    method: "function goal() view returns (uint256)",
-    params: []
-  })
-
-  const { data: campaignBalance, isLoading: isLoadingBalance } = useReadContract({
-    contract,
-    method: "function getContractBalance() view returns (uint256)",
-    params: []
-  })
-
-  let progress = (Number(campaignBalance) / Number(campaignGoal)) * 100
-  if (progress > 100) {
-    progress = 100
-  }
+  const {
+    campaignName,
+    campaignDescription,
+    campaignGoal,
+    campaignBalance,
+    isLoadingGoal,
+    isLoadingBalance,
+    progress,
+  } = useCampaignData(campaignAddress)
 
   return (
     <div className="flex flex-col p-6 bg-white border-slate-200 rounded-lg shadow">
@@ -57,7 +29,7 @@ export default function CampaignCard({ campaignAddress }: CampaignCardProps) {
         </div>
       )}
       <h5 className="mb-2 text-2xl font-bold">{campaignName}</h5>
-      <p className="mb-3 text-gray-700 dark:text-gray-400 font-normal">{campaginDescription}</p>
+      <p className="mb-3 text-gray-700 dark:text-gray-400 font-normal">{campaignDescription}</p>
       <Link
         className="mt-auto"
         href={`/campaign/${campaignAddress}`}
