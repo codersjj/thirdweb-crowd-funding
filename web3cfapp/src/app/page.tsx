@@ -19,7 +19,7 @@ export default function Home() {
     method: "function getAllCampaigns() external view returns ((address campaignAddress, address owner, string name, uint256 creationTime)[])",
     params: []
   })
-    console.log("🚀 ~ Home ~ campaigns, isLoading:", campaigns, isLoading)
+  console.log("🚀 ~ Home ~ campaigns, isLoading:", campaigns, isLoading)
 
   return (
     <main className="mx-auto max-w-7xl px-4 mt-4 sm:px-6 lg:px-8">
