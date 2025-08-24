@@ -11,9 +11,10 @@ type TierCardProps = {
   tier: Tier;
   index: number;
   contract: ThirdwebContract;
+  isEditing: boolean;
 }
 
-export default function TierCard({ tier, index, contract }: TierCardProps) {
+export default function TierCard({ tier, index, contract, isEditing }: TierCardProps) {
   return (
     <div className="max-w-sm flex flex-col p-6 bg-white border border-slate-200 rounded-lg shadow">
       <div className="flex flex-row justify-between items-center">
@@ -44,6 +45,26 @@ export default function TierCard({ tier, index, contract }: TierCardProps) {
           Select
         </TransactionButton>
       </div>
+      {isEditing && (
+        <TransactionButton
+          transaction={() => prepareContractCall({
+            contract,
+            method: "function removeTier(uint256 _index)",
+            params: [BigInt(index)]
+          })}
+          onTransactionConfirmed={() => alert("Tier removed successfully!")}
+          style={{
+            marginTop: '1rem',
+            borderRadius: '0.375rem',
+            padding: '0.5rem 1rem',
+            backgroundColor: '#dc2626',
+            color: 'white',
+            cursor: 'pointer'
+          }}
+        >
+          Remove
+        </TransactionButton>
+      )}
     </div>
   );
 }
